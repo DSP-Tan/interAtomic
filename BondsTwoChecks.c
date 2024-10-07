@@ -294,12 +294,11 @@ return 0;
 
 int getCellSize( char datafile[] , double *cell )
 {
-	FILE *fpoint;
 	int natoms=0, i;
 	char strang[80] ;
 	double d ;
 
-	fpoint = safe_open( datafile, "r" );
+	FILE *fpoint = safe_open( datafile, "r" );
 
 	//Get Lattice Constants
 	SkipTo( fpoint, "cell", strang );
