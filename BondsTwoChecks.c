@@ -25,8 +25,8 @@
 #include <math.h>
 #include "funcs.h"
 
-int getCellSize ( char datafile[] , double *cell );
-void read_data	( char datafile[] , double *x, double *y , double *z, int natoms , char **namespt );
+// int getCellSize ( char datafile[] , double *cell );
+// void read_data	( char datafile[] , double *x, double *y , double *z, int natoms , char **namespt );
 int rand_lim    ( int limit) ;
 
 int main( int argc, char** argv){
@@ -57,20 +57,20 @@ printf("%%s %%lf %%lf %%lf - name x y z\n\n");
 
 
 FILE *fout1;
-int natoms,i,j,l, **ptr, *type;			                //natoms is number of atoms
-double cutoff, cell[3], *charge;						//cutoff is the Bonded potentials cutoff, this is used to determine bond and angle topology. It is 2.4 in the case of the model used here. The array cell contains the cell size in x,y and z. The pointer charge points to the memory location of the charges on each atom.
+int natoms,i,l, **ptr, *type;			                          //natoms is number of atoms
+double cutoff, cell[3], *charge;						                //cutoff is the Bonded potentials cutoff, this is used to determine bond and angle topology. It is 2.4 in the case of the model used here. The array cell contains the cell size in x,y and z. The pointer charge points to the memory location of the charges on each atom.
 char dest[80],dest1[80],inputCellFile[80], Potentials[80];	//This will be arrays containing the names of different files, two output files and two input files.
-double *x, *z, *y, *x_, *y_, *z_; 						// The x, y, z are the scaled lammps initial coords. The x_,y_,z_ are the unscaled coords obtained by multiplying the scaled coords by the lattice vectors.
-int mol_ID = 1; 										//This is the molecule I.D needed in the lammps data file which will always be 1.
-char **namespt,**useptt, *nms;
+double *x, *z, *y, *x_, *y_, *z_; 						              // The x, y, z are the scaled lammps initial coords. The x_,y_,z_ are the unscaled coords obtained by multiplying the scaled coords by the lattice vectors.
+int mol_ID = 1; 										                        //This is the molecule I.D needed in the lammps data file which will always be 1.
+char **namespt,**useptt;
 
 for(i=0;i<80;i++){
-   dest[i]       = '\0';
-   dest1[i]      = '\0';
+   dest[i]           = '\0';
+   dest1[i]          = '\0';
    inputCellFile[i]  = '\0';
-   Potentials[i] = '\0';
+   Potentials[i]     = '\0';
    }
-cutoff = 2.4;	//This is the cutoff distance for the bonded potentials
+cutoff = 2.4;
 
 /*bondptr is a pointer to an array of all bonds in the system
  *bondcoeffs[96] is an array which will contain all the bond types, 96 being
@@ -118,6 +118,7 @@ for(i=0;i<9;i++){
 /*-----------------OutPut and Input Files Definition----------------------------------*/
 /*------------------------------------------------------------------------------------*/
 
+// change all this to snprintf
 sprintf( inputCellFile,"%s", argv[1]);  //The first argument to the funciton is the file containing all of the atomic positions and lattice constants.
 sprintf( Potentials,"%s", argv[2]  );   //The second argument to the funciton is the file containing all the potential parameters.
 sprintf( dest ,"%s", "data.lammps" );   //This is the lammps data file which will contain bond and angle topology and be input to lammps script.
@@ -126,8 +127,8 @@ sprintf( dest1 ,"%s", "Random.txt" );   //This is the output for a file which ge
 puts(inputCellFile);
 puts(dest);
 
-/*----------Find number of atoms for memory allocation and variable declarations/definitions------------*/
 /*------------------------------------------------------------------------------------------------------*/
+/*----------Find number of atoms for memory allocation and variable declarations/definitions------------*/
 /*------------------------------------------------------------------------------------------------------*/
 
 natoms = getCellSize (inputCellFile , cell );
@@ -141,19 +142,12 @@ z_     =( double *)malloc( natoms*sizeof(double) );
 type   =(   int*  )malloc( natoms*sizeof( int  ) );
 charge =( double *)malloc( natoms*sizeof(double) );
 
-/*Namespt will point to all of the names of the atoms, so we will need to
- *allocate memory for strings: */
-namespt=(  char **)malloc( natoms*sizeof( char*) );
-useptt = namespt;
-
-for(i=0;i<natoms;i++){
-   *useptt = ( char* )malloc( 8*sizeof( char ) );
-   nms = *useptt;
-   for(j=0;j<8;j++)
-      *nms++ = '\0';
+useptt = namespt=(  char **)malloc( natoms*sizeof( char*) );
+for(i=0;i<natoms;i++) {
+   *useptt = (char*)malloc(8 * sizeof(char));
+   memset(*useptt, '\0', 8);
    useptt++;
    }
-nms = *namespt;
 
 printf("\n\nMemory Allocations Complete\n");
 
@@ -273,77 +267,6 @@ return 0;
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*This function gets all the parameters necessary to properly read the data from the gulp input
- * and to then properly create a bonded lammps input. It reads in the cell size in each dimension,
- * the spring constant for the harmonic pot, the equillibrium distance, and the cutoff for bonded atoms.
- */
-
-int getCellSize( char datafile[] , double *cell )
-{
-	int natoms=0, i;
-	char strang[80] ;
-	double d ;
-
-	FILE *fpoint = safe_open( datafile, "r" );
-
-	//Get Lattice Constants
-	SkipTo( fpoint, "cell", strang );
-	fscanf(fpoint,"%lf %lf %lf",&cell[0],&cell[1],&cell[2]);
-
-	//Determine Number of atoms.
-	fpoint = SkipTo( fpoint, "frac",strang );
-	while ( fscanf( fpoint, "%s %lf %lf %lf %d %d %d", strang,&d,&d,&d, &i,&i,&i ) == 7 )
-		natoms++;
-
-	fclose( fpoint );
-
-  printf("natoms: %d\n",natoms);
-  printf("cell:   %lf %lf %lf\n",cell[0],cell[1],cell[2]);
-
-	return natoms;
-}
-
-
-void read_data ( char datafile[], double *x, double *y , double *z, int natoms, char **namespt)
-{
-FILE *fpoint;
-int n,i, f1,f2,f3;                 //n and i are loop indices, f1, f2 and f3 are the flags which appear next to the atom coordinates in supercell_corr2.dat
-char strang[80],name[8];
-
-printf("\nread_data\n\n");
-
-for (i=0;i<8;i++)
-   name[i] = '\0';
-
-fpoint = safe_open( datafile, "r" );
-fpoint = SkipTo( fpoint, "frac" , strang );
-
-for(n=0;n<natoms;n++){
-   fscanf( fpoint, "%s %lf %lf %lf %d %d %d", name,&x[n],&y[n],&z[n],&f1,&f2,&f3 );
-   for (i= 0; i<8; i++){
-      *(*namespt+i) = name[i];
-      }
-   namespt++;
-   }
-
-printf("\n\n");
-fclose( fpoint );
-
-}
 
 
 int rand_lim(int limit) {

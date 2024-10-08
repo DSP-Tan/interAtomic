@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall
-objects = BondsTwoChecks.o makebonds.o AtomTypes.o SkipToCommand.o angles.o
+objects = BondsTwoChecks.o makebonds.o AtomTypes.o SkipToCommand.o angles.o parseSupercell.o
 all: mai
 
 mai: $(objects)
@@ -18,6 +18,8 @@ makebonds.o: makebonds.c funcs.h
 angles.o: angles.c funcs.h
 	$(CC) $(CFLAGS) -c angles.c
 
+parseSupercell.o: parseSupercell.c funcs.h
+	$(CC) $(CFLAGS) -c parseSupercell.c
 
 SkipToCommand.o: SkipToCommand.c
 	$(CC) $(CFLAGS) -c SkipToCommand.c
@@ -26,5 +28,5 @@ clean:
 	rm *.o *~
 
 
-	
 
+# gcc tests/testGetCellSize.c parseSupercell.c SkipToCommand.c -lm
