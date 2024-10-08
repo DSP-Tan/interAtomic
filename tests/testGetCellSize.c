@@ -4,11 +4,19 @@
 
 int getCellSize( char datafile[] , double *cell );
 
+// To Do: Test 3 sample input cells, with the values to test and the filenames
+// in arrays so that you can just look over them.
+
+// Consider in the make file actually creating these cells if they do not exist.
+// They should not really be in the repo as they would be a bit large.
+
 // Here we will test getCellSize using 3 sample input cells of a known size.
 int main(){
 
 double cell[3];
 int test_a_1, test_b_1, test_c_1, test_natoms_1;
+int test_a_2, test_b_2, test_c_2, test_natoms_2;
+int test_a_3, test_b_3, test_c_3, test_natoms_3;
 
 char datafile1[80]= "10_10_20_1.txt";
 char datafile2[80]= "2_2_4_1.txt";
