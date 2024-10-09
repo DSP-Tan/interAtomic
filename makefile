@@ -1,13 +1,13 @@
 CC = gcc
 CFLAGS = -Wall
-objects = BondsTwoChecks.o makebonds.o AtomTypes.o SkipToCommand.o angles.o parseSupercell.o
+objects = main.o makebonds.o AtomTypes.o SkipToCommand.o angles.o parseSupercell.o
 all: mai
 
 mai: $(objects)
 	$(CC) $(CFLAGS) -O2 -o mai $(objects) -lm
 
-BondsTwoChecks.o: BondsTwoChecks.c funcs.h
-	$(CC) $(CFLAGS) -c BondsTwoChecks.c
+main.o: main.c funcs.h
+	$(CC) $(CFLAGS) -c main.c
 
 AtomTypes.o: AtomTypes.c funcs.h
 	$(CC) $(CFLAGS) -c AtomTypes.c
@@ -25,7 +25,7 @@ SkipToCommand.o: SkipToCommand.c
 	$(CC) $(CFLAGS) -c SkipToCommand.c
 
 clean:
-	rm *.o *~
+	rm *.o 
 
 
 
