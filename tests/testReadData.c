@@ -64,7 +64,7 @@ tName[31] ="N201"; testX[31]= 0.750000;testY[31]= 0.500000; testZ[31]= 0.808985;
 
 read_data ( datafile, x, y , z, natoms, names);
 
-double e = 1e-7;
+double e = 1e-8;
 for(i=0;i<natoms;i++){
   assert(x[i] >= testX[i]-e && x[i] <= testX[i]+e);
   assert(y[i] >= testY[i]-e && y[i] <= testY[i]+e);
