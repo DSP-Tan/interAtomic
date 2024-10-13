@@ -34,27 +34,25 @@ int *elem_ptr, **usr_ptr;
 *num_types = 1;
 temp = (int *) malloc( natoms*( sizeof(int) ) ) ;
 
-/* The large if else if structure below assigns a number to each atom type
+/*
+ * The large if else if structure below assigns a number to each atom type
  * present in the Gulp input, and also gives the charge associated with this
  * atom type.
  *
  * However, this structure will result in type lists like [1,7,1,7,1,7]
- * for example if only Ga1 and N101 are present. Lammps does not like this
- * and would like, if there are two atom types, for these types to be
- * type 1 and type 2, with type[1,2,1,2,1] etc. The integer values for
- * each atom type are reassigned after this big block to be in this form
- * and a description of which type is which is printed out.
+ * Lammps must have types between 1 and n_types, where n_types is the total
+ * number of distinct types. I.e. the above array should be:  [1,2,1,2,1] etc.
+ *
+ * The integer values for each atom type are reassigned  to be in this form
+ * and a description of which type is which is printed.
  */
-
 
 printf("\n\nNote:The effective charges are just set in AtomTypes.c\n");
 printf("They do not make reference to the potentials file. This should be changed;");
 printf("but for now if you want to change the effective charges, you must go to AtomTypes.c.\n\n");
 
-//#pragma omp parallel for
 for( i=0; i<natoms; i++ )
 {
-  // if word starts with Ga
 	if ( strcmp(*(namespt+i),"Ga1") == 0 ){
 		charge[i] = 0.859;
 		type[i] = 1;
@@ -63,7 +61,6 @@ for( i=0; i<natoms; i++ )
 		type[i] = 2;
 		charge[i] = 0.859;
 	}
-  // if word starts with In
 	else if ( strcmp(*(namespt+i), "In1") == 0 ){
 		charge[i] = 1.084;
 		type[i] = 3;
@@ -72,7 +69,6 @@ for( i=0; i<natoms; i++ )
 		charge[i] = 1.084;
 		type[i] = 4;
 	}
-  // if word starts with Al
 	else if ( strcmp(*(namespt+i), "Al1") == 0 ){
 		charge[i] = 1.500;
 		type[i] = 5;
