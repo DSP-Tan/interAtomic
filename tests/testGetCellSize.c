@@ -1,8 +1,6 @@
 #include <stdio.h>
-#include<assert.h>
+#include <assert.h>
 #include "../funcs.h"
-
-int getCellSize( char datafile[] , double *cell );
 
 // To Do: Test 3 sample input cells, with the values to test and the filenames
 // in arrays so that you can just look over them.
