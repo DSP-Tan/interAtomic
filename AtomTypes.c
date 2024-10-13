@@ -1,4 +1,3 @@
-//TO DO: The comments for this code are out of date.
 //TO DO: Return the "types" double array using malloc and double
 //pointies.
 
@@ -6,17 +5,17 @@
  *associated with each atom in the arrays type[] and charge[]. It assigns
  *the types of the atoms from GULP in a manner suitable for use in Lammps.
  */
- 
+
 /* The function also takes in the address of an empty integer vairable to
  * assign the size of the two dimensional array types of width 2 which it returns.
- * Thus the function gives out the array types[num_types][2] and num_types, as
+ * Thus the function returns the array types[num_types][2] and num_types, as
  * well as filling in the arrays type[] and charge[].
  */
 
 /*Important: The memory pointed to by the double pointer returned by this
  *is not free'd at the end of the function. Don't forget to use free on the
  *pointer to which you assign the address of the memory malloc'd here.
- */ 
+ */
 
 
 #include"funcs.h"
@@ -29,30 +28,33 @@
 int cmpfunc (const void * a, const void * b);
 
 int** atomtypes( int natoms, char **namespt , int *type, double *charge , int *num_types ){
-	
-int *temp,i,j,k,**ptr;							
+
+int *temp,i,j,k,**ptr;
 int *elem_ptr, **usr_ptr;
-*num_types = 1;							
+*num_types = 1;
 temp = (int *) malloc( natoms*( sizeof(int) ) ) ;
 
 /* The large if else if structure below assigns a number to each atom type
  * present in the Gulp input, and also gives the charge associated with this
  * atom type.
- * 
+ *
  * However, this structure will result in type lists like [1,7,1,7,1,7]
  * for example if only Ga1 and N101 are present. Lammps does not like this
- * and would like, if there are two atom types, for these types to be 
+ * and would like, if there are two atom types, for these types to be
  * type 1 and type 2, with type[1,2,1,2,1] etc. The integer values for
  * each atom type are reassigned after this big block to be in this form
  * and a description of which type is which is printed out.
- */	
+ */
 
 
-printf("\n\nNote:The effective charges are just set in AtomTypes.c\nThey do not make reference to the potentials file. This should be changed; but for now if you want to change the effective charges, you must go to AtomTypes.c.\n\n");
+printf("\n\nNote:The effective charges are just set in AtomTypes.c\n");
+printf("They do not make reference to the potentials file. This should be changed;");
+printf("but for now if you want to change the effective charges, you must go to AtomTypes.c.\n\n");
 
-//#pragma omp parallel for 
+//#pragma omp parallel for
 for( i=0; i<natoms; i++ )
 {
+  // if word starts with Ga
 	if ( strcmp(*(namespt+i),"Ga1") == 0 ){
 		charge[i] = 0.859;
 		type[i] = 1;
@@ -61,6 +63,7 @@ for( i=0; i<natoms; i++ )
 		type[i] = 2;
 		charge[i] = 0.859;
 	}
+  // if word starts with In
 	else if ( strcmp(*(namespt+i), "In1") == 0 ){
 		charge[i] = 1.084;
 		type[i] = 3;
@@ -69,6 +72,7 @@ for( i=0; i<natoms; i++ )
 		charge[i] = 1.084;
 		type[i] = 4;
 	}
+  // if word starts with Al
 	else if ( strcmp(*(namespt+i), "Al1") == 0 ){
 		charge[i] = 1.500;
 		type[i] = 5;
@@ -175,7 +179,7 @@ for( i=0; i<natoms; i++ )
 	}
 	else if ( strcmp(*(namespt+i), "N113") == 0 ){
 		charge[i] = -1.292;
-		type[i] = 31;	
+		type[i] = 31;
 	}
 	else if ( strcmp(*(namespt+i), "N213") == 0 ){
 		charge[i] = -1.292;
@@ -205,29 +209,24 @@ printf("Types Assigned\n");
 /* Now these type names must be reassigned so that they are in ascending
  * order and a difference of 1 between each type. To do this we will make a copy
  * of type[], sort this array, and then count the inversions in this sorted array
- * to determine the number of distinct bonds. We will then rename the types such that
+ * to determine the number of distinct types. We will then rename the types such that
  * the first type is type one, the third type is type three, etc.
  */
 
-//Make a copy of the types to be sorted using bubblesort and then sort
+//Make a copy of the types and sort it.
 
-//#pragma omp parallel for
 for( i=0;i<natoms;i++ )
 	temp[i] = type[i];
 
 clock_t start = clock(), diff;
 int msec;
 
-printf("BubbleSort\n");	
+printf("Sort\n");
 qsort( temp, natoms,sizeof(int), cmpfunc );
-printf("done!");
 diff = clock() - start;
 
 msec = diff * 1000 / CLOCKS_PER_SEC;
-printf("Time taken %d seconds %d milliseconds\n", msec/1000, msec%1000);
-
-
-//babblesort( natoms, temp );
+printf("Time taken to sort: %d seconds %d milliseconds\n", msec/1000, msec%1000);
 
 
 //Find number of distinct atom types and record in variable count.
@@ -236,7 +235,7 @@ for( i=1; i< natoms; i++ )
 	if( temp[i-1] != temp[i] )
 		count++;
 *num_types = count+1;
-printf("There are %d distinct atom types\n", (*num_types ) );	
+printf("There are %d distinct atom types\n", (*num_types ) );
 /*This counts the number of inversions, so it will be "number of distinct types" -1
  *Since the first inversion gives "count =1" when there are infact two distinct types involved
  *every subsequent inversion will however add the correct additional distinct atom type.
@@ -256,7 +255,7 @@ printf("There are %d distinct atom types\n", (*num_types ) );
 //Declare and Initialise array "types".
 
 ptr = ( int**) malloc( (*num_types) * sizeof ( int * ) ) ;
-usr_ptr = ptr; 
+usr_ptr = ptr;
 for( i=0; i< (*num_types); i++){
 	*usr_ptr = ( int* ) malloc( 2*sizeof( int ) );
 	elem_ptr = *usr_ptr;
@@ -264,10 +263,10 @@ for( i=0; i< (*num_types); i++){
 	*(elem_ptr+1) = 0;		//*( *usr_ptr +1 )
 	usr_ptr++;
 	}
-usr_ptr = ptr; 
- 
-printf("Types on Heap allocated"); 
- 
+usr_ptr = ptr;
+
+printf("Types on Heap allocated");
+
 int types[ (*num_types ) ][2];										    //Use malloc here so scope extends beyond function.
 
 for (i =0; i< (*num_types); i++ ){
@@ -275,7 +274,7 @@ for (i =0; i< (*num_types); i++ ){
 	types[i][1] = 0;
    }
 
-printf("\nTypes on stack allocated");
+printf("\nTypes on stack allocated\n");
 /*Since the array is ordered, each inversion will correspond to the presence
  *of a new distinct atom type. This is used to put each distinct atom type
  *into the array types, along with information about the type, as well as
@@ -308,13 +307,13 @@ for( i=1; i< natoms; i++ )
 //that to get the successive memory locatations.
 
 
-	
+
 count++; //Now count = num_types
 
 /*Now we need only reassign the types so that instead of being something
  *like 1,7,1,7,47,1,7 it's 1,2,1,2,3,1,2
  */
- 
+
 for( i=0; i < *num_types; i++ )
 	**(ptr+i) = i+1;
 
@@ -328,7 +327,7 @@ for( i=0; i<natoms; i++ )
 return ptr;
 }
 //So ptr points to num_atoms arrays of 2 integers. ptr+i gives you types[i].
-// *(ptr+i) will give you the address pointed to by ptr+i. This will be the 
+// *(ptr+i) will give you the address pointed to by ptr+i. This will be the
 // address of the 2 element arrays. So *(*(ptr+i)) = types[i][0] . Can probably
 // do (*(*(ptr+i)))[1] = types[i][1].
 // *(*(ptr+i)+1) = types[i][1]

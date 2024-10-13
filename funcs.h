@@ -46,10 +46,10 @@ struct bond {
 // file parsing functions
 int getCellSize( char datafile[] , double *cell );
 void read_data ( char datafile[], double *x, double *y , double *z, int natoms, char **namespt);
+FILE* SkipTo( FILE *fptr , const char* command , char cmdline[] );
+FILE* safe_open	( const char* filename , const char *mode );
 
 double Distance ( double x1, double y1, double z1, double x2, double y2, double z2 );
 int** atomtypes( int natoms,  char **namespt , int *type, double *charge, int *num_types );
 struct bond* makebonds(char *source, int natoms, double *x_, double *y_, double *z_, int **types, int *type,int num_types, char **namespt ,double cutoff,double *cell,int *NumberOfBonds,struct bond *bondcoeffs, int *NumberOfBondTypes);
 struct Angles* makeangles ( char *source,int natoms, double *x_,double *y_,double *z_, char **namespt, double cutoff,double *cell, struct bond *bonds,int NumBonds, int* NumberOfAngles, struct Angles *PosibAngs, int *NumberOfAngleTypes );
-FILE* SkipTo( FILE *fptr , const char* command , char cmdline[] );
-FILE* safe_open	( const char* filename , const char *mode );
