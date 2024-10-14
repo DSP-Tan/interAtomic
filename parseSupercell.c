@@ -5,7 +5,7 @@
  * and to then properly create a bonded lammps input. It reads in the cell size in each dimension,
  * the spring constant for the harmonic pot, the equillibrium distance, and the cutoff for bonded atoms.
  */
-int getCellSize( char datafile[] , double *cell )
+int getCellSize(const char *datafile , double *cell )
 {
 	int natoms=0, i;
 	char strang[80] ;
@@ -31,7 +31,7 @@ int getCellSize( char datafile[] , double *cell )
 }
 
 
-void read_data ( char datafile[], double *x, double *y , double *z, int natoms, char **namespt)
+void read_data (const char *datafile, double *x, double *y , double *z, int natoms, char **namespt)
 {
 int i, f;
 char strang[80];

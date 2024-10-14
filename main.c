@@ -59,17 +59,11 @@ printf("%%s %%lf %%lf %%lf - name x y z\n\n");
 FILE *fout1;
 int natoms,i,l, **ptr, *type;			                          //natoms is number of atoms
 double cutoff, cell[3], *charge;						                //cutoff is the Bonded potentials cutoff, this is used to determine bond and angle topology. It is 2.4 in the case of the model used here. The array cell contains the cell size in x,y and z. The pointer charge points to the memory location of the charges on each atom.
-char dest[80],dest1[80],inputCellFile[80], Potentials[80];	//This will be arrays containing the names of different files, two output files and two input files.
+const char *dest,*inputCellFile, *Potentials;	              //This will be arrays containing the names of different files, two output files and two input files.
 double *x, *z, *y, *x_, *y_, *z_; 						              // The x, y, z are the scaled lammps initial coords. The x_,y_,z_ are the unscaled coords obtained by multiplying the scaled coords by the lattice vectors.
 int mol_ID = 1; 										                        //This is the molecule I.D needed in the lammps data file which will always be 1.
 char **namespt,**useptt;
 
-for(i=0;i<80;i++){
-   dest[i]           = '\0';
-   dest1[i]          = '\0';
-   inputCellFile[i]  = '\0';
-   Potentials[i]     = '\0';
-   }
 cutoff = 2.4;
 
 /*bondptr is a pointer to an array of all bonds in the system
@@ -118,11 +112,9 @@ for(i=0;i<9;i++){
 /*-----------------OutPut and Input Files Definition----------------------------------*/
 /*------------------------------------------------------------------------------------*/
 
-// change all this to snprintf
-sprintf( inputCellFile,"%s", argv[1]);  //The first argument to the funciton is the file containing all of the atomic positions and lattice constants.
-sprintf( Potentials,"%s", argv[2]  );   //The second argument to the funciton is the file containing all the potential parameters.
-sprintf( dest ,"%s", "data.lammps" );   //This is the lammps data file which will contain bond and angle topology and be input to lammps script.
-sprintf( dest1 ,"%s", "Random.txt" );   //This is the output for a file which generates atoms which are randomly displaced by 1% in order to test the minimisation algorithms
+inputCellFile=argv[1];       //The first argument to the funciton is the file containing all of the atomic positions and lattice constants.
+Potentials   =argv[2];       //The second argument to the funciton is the file containing all the potential parameters.
+dest         ="data.lammps"; //This is the lammps data file which will contain bond and angle topology and be input to lammps script.
 
 puts(inputCellFile);
 puts(dest);

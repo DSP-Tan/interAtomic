@@ -8,31 +8,31 @@
 
 int compare(const void *p1, const void *p2);
 
-struct bond* makebonds( char *source, int natoms, double *x_, double *y_, double *z_,int **types, int *type, int num_types, 
-char **namespt , double cutoff, double *cell , int *NumberOfBonds,struct bond *bondcoeffs, 
+struct bond* makebonds(const char *source, int natoms, double *x_, double *y_, double *z_,int **types, int *type, int num_types,
+char **namespt , double cutoff, double *cell , int *NumberOfBonds,struct bond *bondcoeffs,
 int *NumberOfBondTypes )
 {
-double kGaN, kInN, kAlN;	
+double kGaN, kInN, kAlN;
 //These are the force constants for the harmonic potential between Gan, InN and AlN respectively
 
 double r0_GaN, r0_InN, r0_AlN,r0;
 
 double xi_unwrapped, xj_unwrapped, yi_unwrapped, yj_unwrapped, zi_unwrapped, zj_unwrapped;
 double r_ij,r_ij_unwrapped;
-int Bond_ID;	
+int Bond_ID;
 FILE *ptr;
 char string[80],  name1[10],  name2[10], name3[10];
 double trash,K;
-int NumBondTypes, NumDistinctBonds, NumDistinctPresentBonds,count,i,j,k,l;  
+int NumBondTypes, NumDistinctBonds, NumDistinctPresentBonds,count,i,j,k,l;
 //These variables all refer to bond types.
 
 /*--------------------------------------------------------------------*/
 /*------------Initialise Variables--------------------------------------
  * -------------------------------------------------------------------*/
-kGaN = 9.0650;	  
-kInN = 7.005;  //Note these are the GULP values/2 because lammps incorporates the hallf into the constant.              
+kGaN = 9.0650;
+kInN = 7.005;  //Note these are the GULP values/2 because lammps incorporates the hallf into the constant.
 kAlN = 10.5;
-r0_GaN = 1.949; 
+r0_GaN = 1.949;
 r0_InN = 2.155;
 r0_AlN = 1.895;
 
@@ -75,13 +75,13 @@ fgets( string, 80 , ptr );				       //Skip line containing '1'
 /*To get the maximum number of bond types, we go through the polynomial
  * section of the potentials file, as this uniquely determines each bond.
  * we check if the first atom type of a given line is present in our previously
- * determined atom types, and then we check if the second atom type is 
- * also present. 
+ * determined atom types, and then we check if the second atom type is
+ * also present.
 *This gives the maximum possible number of bond types since it says if there
 * is a Ga and a N present, there might be a bond between them. Though you could
 * imagine a scenario where there are a Ga and an N but they are too far to bond. */
 
-NumBondTypes = 0;                                      
+NumBondTypes = 0;
 while( fscanf( ptr, "%s %s %lf %lf %lf %lf", name1, name2, &trash, &K, &trash, &trash ) == 6 ){
    count=0;
 	for( i=0; i< num_types; i++ ){
@@ -91,7 +91,7 @@ while( fscanf( ptr, "%s %s %lf %lf %lf %lf", name1, name2, &trash, &K, &trash, &
             if( strcmp( name2, *(namespt + *(*(types+j)+1) )  ) == 0 ){
                count++;
                break;
-               } 
+               }
          }
 		if( count == 2 ){
 			NumBondTypes++;
@@ -102,7 +102,7 @@ while( fscanf( ptr, "%s %s %lf %lf %lf %lf", name1, name2, &trash, &K, &trash, &
 
 printf("\nThere are at most %d Bond Types\n",NumBondTypes);
 
-//TO DO: Now that we have pared down number of bonds, fill each of these 
+//TO DO: Now that we have pared down number of bonds, fill each of these
 //bonds with information about bond the two force constants, the atom types.
 
 struct bond Bonds[NumBondTypes];								//Note: The bond ID is also stored in the element number here.
@@ -139,7 +139,7 @@ while( fscanf( ptr, "%s %s %lf %lf %lf %lf", name1, name2, &trash, &K, &trash, &
 				     Bonds[count].r0 = r0_InN;
 				     }
 				  count++;
-				  }         
+				  }
 
 fclose( ptr );
 
@@ -153,8 +153,8 @@ printf("count=%d, NumbondTypes = %d\n",count,NumBondTypes);
 for( i=0;i<NumBondTypes;i++)
 	for( j=0; j<NumBondTypes; j++ )
 		if( Bonds[i].K1 == Bonds[j].K1 && Bonds[i].K2 == Bonds[j].K2 ){
-			Bonds[i].BType = ( Bonds[i].BType > Bonds[j].BType ? Bonds[j].BType : Bonds[i].BType );		
-			Bonds[j].BType = ( Bonds[j].BType > Bonds[i].BType ? Bonds[i].BType : Bonds[j].BType );		
+			Bonds[i].BType = ( Bonds[i].BType > Bonds[j].BType ? Bonds[j].BType : Bonds[i].BType );
+			Bonds[j].BType = ( Bonds[j].BType > Bonds[i].BType ? Bonds[i].BType : Bonds[j].BType );
 			//Conditional operator assigns type to be printed. It goes Condition ? returnvalue1 : returnvalue 2 ; Turn this into a big case thing.
 		   }
 
@@ -174,12 +174,12 @@ diff = clock() - start;
 
 //--------------Write Bonding Information-------------------------------------------//
 
-struct bond *bondptr; 
+struct bond *bondptr;
 struct bond *usrptr;
 
 
 bondptr = ( struct bond * ) malloc( (natoms*2)  * sizeof (struct bond ) ) ;
-usrptr = bondptr;   
+usrptr = bondptr;
 *NumberOfBonds = natoms*2;
 Bond_ID = 1;
 
@@ -188,9 +188,9 @@ for (i=0; i<natoms; i++)
 		for( k=0; k< NumBondTypes; k++)
 		   if( (type[i] == Bonds[k].atType1 && type[j] == Bonds[k].atType2 ) || (type[j] == Bonds[k].atType1 && type[i] == Bonds[k].atType2) )
 		      {
-			   
+
 		      r_ij = Distance( x_[i], y_[i], z_[i] , x_[j], y_[j], z_[j] );
-		      
+
 		      if( r_ij < cutoff ){
                Bonds[k].present = 1;
                *usrptr = Bonds[k];
@@ -198,50 +198,50 @@ for (i=0; i<natoms; i++)
                usrptr->atID2 = j+1;
                usrptr->B_ID = Bond_ID;
                usrptr++;
-               Bond_ID++;  
-               }  
-			  		
-			  if (  (x_[i] > cell[0] - cutoff && x_[j] < cutoff) || (x_[j] > cell[0] -cutoff && x_[i] < cutoff) 
-              || (y_[i] > cell[1] - cutoff && y_[j] < cutoff) || (z_[i] > cell[2] - cutoff && z_[j] < cutoff) 
+               Bond_ID++;
+               }
+
+			  if (  (x_[i] > cell[0] - cutoff && x_[j] < cutoff) || (x_[j] > cell[0] -cutoff && x_[i] < cutoff)
+              || (y_[i] > cell[1] - cutoff && y_[j] < cutoff) || (z_[i] > cell[2] - cutoff && z_[j] < cutoff)
               || (y_[j] > cell[1] - cutoff && y_[i] < cutoff) || (z_[j] > cell[2] - cutoff && z_[i] < cutoff) )
 				{
-			  
+
 			    xi_unwrapped = x_[i];
 			    yi_unwrapped = y_[i];
 			    zi_unwrapped = z_[i];
-			
+
 			    xj_unwrapped = x_[j];
 			    yj_unwrapped = y_[j];
 			    zj_unwrapped = z_[j];
-				
-					
+
+
 				/*If atom i is near end of cell in any dimension, and atom j is near beginning of cell
 				 * in this same dimension. Calculate the distance and make the bond between the image atoms
 				 */
-				 	
+
 				if (x_[i] > cell[0] -cutoff && x_[j] < cutoff)
 					xi_unwrapped = x_[i] - cell[0];
 				if (y_[i] > cell[1] - cutoff && y_[j] < cutoff)
 					yi_unwrapped = y_[i] - cell[1];
 				if (z_[i] > cell[2] - cutoff && z_[j] < cutoff)
 					zi_unwrapped = z_[i] - cell[2];
-					
-					
+
+
 				/*If atom j is near end of cell in any dimension, and atom i is near beginning of cell
 				 * in this same dimension. Calculate the distance and make the bond between the image atoms
 				 */
-				  
+
 				if (x_[j] > cell[0] -cutoff && x_[i] < cutoff)
 					xj_unwrapped = x_[j] - cell[0];
 				if (y_[j] > cell[1] - cutoff && y_[i] < cutoff)
 					yj_unwrapped = y_[j] - cell[1];
 				if (z_[j] > cell[2] - cutoff && z_[i] < cutoff)
-					zj_unwrapped = z_[j] - cell[2];	
-					
-					
+					zj_unwrapped = z_[j] - cell[2];
+
+
 				r_ij_unwrapped = Distance( xi_unwrapped, yi_unwrapped, zi_unwrapped, xj_unwrapped, yj_unwrapped, zj_unwrapped );
 
-				
+
 				if ( r_ij_unwrapped < cutoff )
 					{
                Bonds[k].present = 1;
@@ -252,22 +252,22 @@ for (i=0; i<natoms; i++)
 				   usrptr++;
 					Bond_ID++;
 					}
-					
+
 				if( r_ij_unwrapped < cutoff && r_ij < cutoff ){
 				   printf("\n\nWARNING double bond created\n\n");
 				   exit(-1);
                }
 				}
-			}	
+			}
 
 Bond_ID--;			//Bond_ID was incremented in last iteration of loop.
 
-	
+
 printf("There are %d pairs of atoms bonded to each other\n", Bond_ID );
 printf("------------------------------------------------------------------------------------------------------------\n");
 
 
-	
+
 /*--------------------------------------Bond coefficients-------------------------------------------*/
 // - Find distinct bond types
 // - Make bond array of these
@@ -301,12 +301,12 @@ for( i=1,k=1; i< NumBondTypes; i++ )
 printf("\n\nThe sorted list of distinct bond types is:\n");
 printf( "Type i\t Type j\t K_1\t\t K_2\t\t r_0\t\t Bond Type\n" );
 for( i=0;i<NumDistinctBonds; i++ )
-	printf( "%d\t %d\t %lf\t %lf\t %lf\t %d\n" , distinct_Bonds[i].atType1, 
-   distinct_Bonds[i].atType2, distinct_Bonds[i].K1 , distinct_Bonds[i].K2 
-   ,distinct_Bonds[i].r0, distinct_Bonds[i].BType );      
-      
+	printf( "%d\t %d\t %lf\t %lf\t %lf\t %d\n" , distinct_Bonds[i].atType1,
+   distinct_Bonds[i].atType2, distinct_Bonds[i].K1 , distinct_Bonds[i].K2
+   ,distinct_Bonds[i].r0, distinct_Bonds[i].BType );
 
-/*The for loop below fixes the fact that the distinct_Bonds array says that certain bonds are not present which 
+
+/*The for loop below fixes the fact that the distinct_Bonds array says that certain bonds are not present which
  *are present. This occurs when two bonds in Bonds which are the same but between different atom types have one of
  *these atom type pairs but not the other. So even though this bond is present, it takes it's information from the
  *element of Bonds[] corresponding to the atom pairs which aren't present.
@@ -321,13 +321,13 @@ for( i=0; i<NumBondTypes; i++ )
 printf("The number of total possible bond types is:  %d\n", NumBondTypes);
 printf("The number of unique possible bond types is: %d\n",NumDistinctBonds);
 
-	
+
 /*So this array distinct_Bonds contains only one of each bond type, but does not contain the full
  *bonding information about which atom type bonds to which. You can cross reference the bond types of this
  *array with the full information of the other array if you need to.
- *		
+ *
  *Before we print out the Bond_Coeffs, we will use the information of how many distinct bonds there are to write properly
- *and with every possible check the bonding information for each atom: 
+ *and with every possible check the bonding information for each atom:
 */
 
 NumDistinctPresentBonds=0;
@@ -345,10 +345,10 @@ for(j=0;j<NumDistinctBonds;j++)
       Present_Bonds[i].BType = i+1;
       i++;
       }
-      
+
 /*Now make sure that the array of bonds with the full information about the bonding constants for particular pairs
  *of atom types has the right Bond Type associated with each of these bonds
- */      
+ */
 for( k=0; k<NumBondTypes; k++ )
    for( l=0; l< NumDistinctPresentBonds; l++)
       if ( Bonds[k].K1 == Present_Bonds[l].K1 && Bonds[k].K2 == Present_Bonds[l].K2 )
@@ -357,11 +357,11 @@ for( k=0; k<NumBondTypes; k++ )
 usrptr = bondptr;
 for(i=0;i<*NumberOfBonds;i++)
    for(j=0;j<NumDistinctPresentBonds;j++)
-      if(usrptr->K1 == Present_Bonds[j].K1 
+      if(usrptr->K1 == Present_Bonds[j].K1
       && usrptr->K2 == Present_Bonds[j].K2){
          usrptr->BType = Present_Bonds[j].BType;
          usrptr++;
-         } 
+         }
 
 
 
@@ -369,8 +369,8 @@ for(i=0;i<*NumberOfBonds;i++)
 //------------------Write Bond Coeffs---------------------------------//
 
 for(i=0;i<NumDistinctPresentBonds;i++)
-   bondcoeffs[i] = Present_Bonds[i];   
-   
+   bondcoeffs[i] = Present_Bonds[i];
+
 //Return array of structs containing all bonds:
 return bondptr;
 
@@ -381,21 +381,19 @@ return bondptr;
 
 int compare(const void *p1, const void *p2)
 {
-   const struct bond *elem1 = p1;    
+   const struct bond *elem1 = p1;
    const struct bond *elem2 = p2;
    return (int)(elem1->BType - elem2->BType);
 }
 
 /*Note: When making these bonds, if two atoms which should be bonded are beyoned
  *the cutoff are distance from each other, then they will not be bonded. This means
- *there will never be any bonded interactions between the two atoms no matter how 
+ *there will never be any bonded interactions between the two atoms no matter how
  *close they come after initialisation of the minimisation. In GULP, there could be
  * two atoms between which there could be a bond, but which are further than cutoff
- * from each other. If these atoms come close during the simulation, they will 
+ * from each other. If these atoms come close during the simulation, they will
  * experience forces between each ohter.
- * 
+ *
  * It is therefore imporant to ensure that your Gulp cutoffs and initial atomic positions
  * correspond properly to the bonding topology you would like to have for the whole run.
  */
-
-

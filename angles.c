@@ -7,22 +7,22 @@
 int anglesort( int n, struct Angles *ptr );
 int compaare(const void *p1, const void *p2);
 
-struct Angles* makeangles(char *source,int natoms, double *x_,double *y_,
-double *z_, char **namespt, double cutoff,double *cell, 
-struct bond *bonds, int NumBonds, int *NumberOfAngles, 
+struct Angles* makeangles(const char *source,int natoms, double *x_,double *y_,
+double *z_, char **namespt, double cutoff,double *cell,
+struct bond *bonds, int NumBonds, int *NumberOfAngles,
 struct Angles *PosibAngs, int *NumberOfAngleTypes)
 {
 int i,j,k,l; //loop indices
 char string[80],  name1[10],  name2[10], name3[10];
 double trash;
-	
+
 //-------------------------------------------Angular Information-------------------------------//
 /*NOTE doing the angular information is specific to how the .gin files are given to you. There is nothing general
  * about this. This assumes in different ways that the angular interactions are given in exactly the form they are given
  * in miguel's gulp scripts used to relax AlInGaN.
- * 
+ *
  * It could be made more general to handle variations in the types of angular potentials, but there's probably no need.
- * 
+ *
  */
 
 
@@ -69,10 +69,10 @@ int AngleAtom1, AngleAtom2,AngleAtom3;
 
 NumAngles = natoms*6;                  // The number of angles in wurzite GaN is 6 times the number of atoms.
 *NumberOfAngles = NumAngles;
-struct Angles *angleptr,*usrptr; 
+struct Angles *angleptr,*usrptr;
 
 angleptr = ( struct Angles * ) malloc(NumAngles * sizeof (struct Angles ) ) ;
-usrptr = angleptr;   
+usrptr = angleptr;
 
 
 NumAngles=0;
@@ -83,24 +83,24 @@ for(i=0;i<NumBonds;i++)
    for(j=i+1;j< NumBonds; j++ )
       if(bonds[i].atID1 == bonds[j].atID1 || bonds[i].atID1 == bonds[j].atID2 || bonds[i].atID2 == bonds[j].atID1 || bonds[i].atID2 == bonds[j].atID2 ){
          if(bonds[i].atID1 == bonds[j].atID1 || bonds[i].atID1 == bonds[j].atID2){
-			   Ang2 = bonds[i].atID1-1; 
+			   Ang2 = bonds[i].atID1-1;
 			   Ang1 = ( bonds[i].atID1 == bonds[j].atID1 ? bonds[j].atID2 : bonds[j].atID1 ) -1 ;
 			   Ang3 = bonds[i].atID2 -1;
-            }		  
+            }
          else if(bonds[i].atID2 == bonds[j].atID1 || bonds[i].atID2 == bonds[j].atID2){
 			   Ang2 = bonds[i].atID2 -1;
 			   Ang1 = ( bonds[i].atID2 == bonds[j].atID1 ? bonds[j].atID2 : bonds[j].atID1 ) -1 ;
 			   Ang3 = bonds[i].atID1 -1;
             }
-		    
-		 //printf("Ang1 = %d Ang2 = %d Ang3 = %d\n\n",Ang1,Ang2,Ang3);   
+
+		 //printf("Ang1 = %d Ang2 = %d Ang3 = %d\n\n",Ang1,Ang2,Ang3);
 		 /*The purpose of the -1's is so that we can use these atom ID's to index into the array of atom names
 		  *which starts at 0, and use this to find the species information about the atoms with these IDs
 		  */
-		    		  
+
 		 for(k=0;k<9;k++)
 		    if(PosibAngs[k].atom1 == **(namespt+Ang2))
-		       if( (PosibAngs[k].atom2 == **(namespt+Ang1) && PosibAngs[k].atom3 == **(namespt+Ang3)) 
+		       if( (PosibAngs[k].atom2 == **(namespt+Ang1) && PosibAngs[k].atom3 == **(namespt+Ang3))
               || (PosibAngs[k].atom2 == **(namespt+Ang3) && PosibAngs[k].atom3 == **(namespt+Ang1)) )
 		          {
                 AngleAtom1 = (PosibAngs[k].atom2== **(namespt+Ang1) ? Ang1 :Ang3);
@@ -108,25 +108,25 @@ for(i=0;i<NumBonds;i++)
                 AngleAtom3 = (PosibAngs[k].atom3== **(namespt+Ang3) ? Ang3 :Ang1);
                 PosibAngs[k].present = 1;
                 *usrptr = PosibAngs[k];
-                usrptr->at1 = AngleAtom1+1; 
-                usrptr->at2 = AngleAtom2+1; 
+                usrptr->at1 = AngleAtom1+1;
+                usrptr->at2 = AngleAtom2+1;
                 usrptr->at3 = AngleAtom3+1;
                 usrptr++;
                 NumAngles++;
-		          }		 
-      }   
+		          }
+      }
 
-  
+
 l=1;
 for(i=0;i<9;i++)
 	if ( PosibAngs[i].present == 1 ){
 		PosibAngs[i].type = l;
-		if( PosibAngs[i+1].present==1 
-      && PosibAngs[i+1].K2 == PosibAngs[i].K2 
-      && PosibAngs[i+1].M == PosibAngs[i].M 
-      && PosibAngs[i+1].N1 == PosibAngs[i].N1 
-      && PosibAngs[i+1].N2 == PosibAngs[i].N2 
-      && PosibAngs[i+1].r1 == PosibAngs[i].r1 
+		if( PosibAngs[i+1].present==1
+      && PosibAngs[i+1].K2 == PosibAngs[i].K2
+      && PosibAngs[i+1].M == PosibAngs[i].M
+      && PosibAngs[i+1].N1 == PosibAngs[i].N1
+      && PosibAngs[i+1].N2 == PosibAngs[i].N2
+      && PosibAngs[i+1].r1 == PosibAngs[i].r1
       && PosibAngs[i+1].r2 == PosibAngs[i].r2 )
 			continue;
 		l++;
@@ -148,7 +148,7 @@ for(i=0;i<NumAngles;i++)
          usrptr++;
          break;
          }
-	
+
 NumAngleTypes = l-1;
 *NumberOfAngleTypes = NumAngleTypes;
 printf("There are %d Angle Types\n", NumAngleTypes);
@@ -156,13 +156,13 @@ printf("There are %d Angle Types\n", NumAngleTypes);
 
 /*Before we write these coefficients, we may want to eliminate repeated
  *Angle types from our array of PosibAngs[k]
- */ 
+ */
 int repeat = 0;
 for(i=1;i<9;i++)
 	if( PosibAngs[i].present == 1 && PosibAngs[i-1].present ==1)
 	   if(PosibAngs[i].type == PosibAngs[i-1].type)
 	      repeat++;
-				
+
 printf("\nThere are %d repeated angle types\n\n",repeat);
 qsort( angleptr, *NumberOfAngles,  sizeof(struct Angles), compaare );
 printf("\nSort again?\n");
@@ -187,18 +187,18 @@ int anglesort( int n, struct Angles *ptr ){
          ptr[i+1] = a;
 	     }
     }
-    
+
 	if( status == 0 )
 	   return status;
 	else
 	   anglesort( n, ptr );
-	
+
 	return status;
 }
 
 int compaare(const void *p1, const void *p2)
 {
-   const struct Angles *elem1 = p1;    
+   const struct Angles *elem1 = p1;
    const struct Angles *elem2 = p2;
    return (int)(elem1->type - elem2->type);
 }
