@@ -25,8 +25,6 @@
 #include <math.h>
 #include "funcs.h"
 
-// int getCellSize ( char datafile[] , double *cell );
-// void read_data	( char datafile[] , double *x, double *y , double *z, int natoms , char **namespt );
 int rand_lim    ( int limit) ;
 
 int main( int argc, char** argv){
@@ -143,7 +141,6 @@ for(i=0;i<natoms;i++) {
 
 printf("\n\nMemory Allocations Complete\n");
 
-int num_types;								//This variable will hold the number of atom types.
 
 
 /* With the number of atoms obtained by getCellSize, we can now see what size our arrays to contain the coords need to be
@@ -153,6 +150,7 @@ int num_types;								//This variable will hold the number of atom types.
 read_data ( inputCellFile, x, y, z, natoms, namespt ) ;
 
 //Get information on atom types, charges etc.
+int num_types;
 printf("\nAtom Types\n\n");
 ptr = atomtypes( natoms, namespt , type, charge , &num_types );
 
