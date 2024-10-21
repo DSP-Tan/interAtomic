@@ -14,7 +14,7 @@ int main (){
 int    natoms,i;
 int    **types,**types_test, *type, *type_test;
 double cell[3], *charge,*charge_test;
-char   *inputCellFile, *potFile;
+char   *potFile;
 double *x, *z, *y;
 char   **namespt,**useptt;
 
@@ -51,11 +51,22 @@ for(int i_test=0; i_test <3 ; i_test ++){
 
    printf("Running test #%d on file:\n%s", i_test, inputCellFiles[i_test] );
    assert(num_types==num_types_test);
+   for(i=0;i<num_types; i++)
+      assert(types[i][0]==types_test[i][0] && types[i][1]==types_test[i][1]);
+
    for(i=0;i<natoms;i++){
      assert(type[i]==type_test[i]);
      assert(charge[i]==charge_test[i]);
    }
-   printf("\nTest #%d passed.\n", i_test);
+   printf("\nTest #%d passed.\n", i_test+1 );
+
+   free(x);free(y);free(z);
+   free(type);free(type_test);
+   free(charge);free(charge_test);
+
+   for(i=0;i<natoms;i++) free(namespt[i]);
+   free(namespt);
+
    }
 
 

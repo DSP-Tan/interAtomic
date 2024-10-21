@@ -12,10 +12,6 @@
 //files have the correct formats so that the code doesn't read in bad numbers and
 //then cause a crash somewhere.
 
-//To Do: In read data, you are not assigning namespt in an efficient manner. Rectify this,
-//you should increment the pointer, rather than start at the start of the pointer and count up from it.
-
-
 //To Do: Check how the angle coefficients are written. Check their initialisation, try to understanding whatever it
 //is that you were doing when you said print it if i==0. what's that about?
 
