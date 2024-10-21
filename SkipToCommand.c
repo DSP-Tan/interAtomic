@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include<math.h>
+#include"funcs.h"
 
 /* This function 'Skip_To_Command' sets the file pointer to point at the part of the file
  * one line past where the specified command is found. I.e. at the first piece
